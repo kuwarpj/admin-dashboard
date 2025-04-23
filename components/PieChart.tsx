@@ -31,8 +31,12 @@ const PieChart = ({
 
   if (!hasData) {
     return (
-      <div className="bg-white p-6 rounded-lg shadow text-center text-sm text-gray-500 h-[257px]">
-        No workspace data available
+      <div className="bg-white flex flex-col justify-center items-center gap-3 p-6 rounded-lg shadow text-center text-sm text-gray-500 h-[257px]">
+        <div>
+          <img src="image.png" width={30} />
+        </div>
+
+        <div>No workspace data available</div>
       </div>
     );
   }
@@ -77,7 +81,7 @@ const PieChart = ({
   };
 
   const options: ChartOptions<"doughnut"> = {
-    cutout: "65%", // smaller width of ring
+    cutout: "65%", 
     plugins: {
       legend: {
         display: false,
