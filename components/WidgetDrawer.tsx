@@ -1,5 +1,5 @@
 import { WidgetMap } from "@/helper";
-import {  X } from "lucide-react";
+import { X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 type WidgetDrawerProps = {
@@ -21,13 +21,19 @@ const WidgetDrawer: React.FC<WidgetDrawerProps> = ({
   widgets,
   onConfirm,
 }) => {
-
   const [selectedTab, setSelectedTab] = useState<string>(categories[0].value);
 
   const [checkedState, setCheckedState] = useState(widgets);
   useEffect(() => {
-    setCheckedState(widgets);
+    const initialized = Object.fromEntries(
+      Object.entries(widgets).map(([key, widgetList]) => [
+        key,
+        widgetList.map((w) => ({ ...w, checked: w.checked ?? true })),
+      ])
+    );
+    setCheckedState(initialized);
   }, [widgets]);
+  
 
   const handleCheck = (category: string, index: number) => {
     const newWidgets = { ...checkedState };
@@ -42,11 +48,12 @@ const WidgetDrawer: React.FC<WidgetDrawerProps> = ({
         (checkedState[cat.value] || []).filter((widget: any) => widget.checked),
       ])
     );
+    
     onConfirm(cleaned);
-    setCheckedState(cleaned);
+    setCheckedState(cleaned)
+
     onClose();
   };
-
   return (
     <div
       className={`fixed top-0 right-0 h-full w-[400px] bg-white shadow-lg z-50 transition-transform flex flex-col ${

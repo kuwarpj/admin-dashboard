@@ -23,9 +23,16 @@ import {
 
 const Dashboard = () => {
   const [widgets, setWidgets] = useState<WidgetMap>(getStoredWidgets());
-
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState<
+    { category: string; title: string }[]
+  >([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+
+
+  console.log("This is clean",widgets)
   const handleAddWidget = (
     category: string,
     widget: { title: string; content: string }
@@ -46,6 +53,29 @@ const Dashboard = () => {
     setWidgets(updated);
     saveWidgets(updated);
   };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const term = e.target.value;
+    setSearchTerm(term);
+    if (!term) {
+      setSearchResults([]);
+      setShowDropdown(false);
+      return;
+    }
+
+    const results: { category: string; title: string }[] = [];
+    Object.entries(widgets).forEach(([category, widgetList]) => {
+      widgetList.forEach((widget: any) => {
+        if (widget.title.toLowerCase().includes(term.toLowerCase())) {
+          results.push({ category, title: widget.title });
+        }
+      });
+    });
+
+    setSearchResults(results);
+    setShowDropdown(true);
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between px-10 py-2">
@@ -58,13 +88,35 @@ const Dashboard = () => {
             Dashboard V2
           </div>
         </div>
-        <div className="flex items-center border border-gray-300 rounded-lg px-3 py-1 w-full max-w-sm bg-white shadow-sm">
-          <Search className="w-4 h-4 text-gray-500 mr-2" />
-          <input
-            type="text"
-            placeholder="Search..."
-            className="w-full outline-none text-sm text-gray-700 bg-transparent placeholder:text-gray-400"
-          />
+        <div className="relative w-full max-w-sm">
+          <div className="flex items-center border border-gray-300 rounded-lg px-3 py-1 bg-white shadow-sm">
+            <Search className="w-4 h-4 text-gray-500 mr-2" />
+            <input
+              type="text"
+              placeholder="Search..."
+              className="w-full outline-none text-sm text-gray-700 bg-transparent placeholder:text-gray-400"
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
+          </div>
+
+          {showDropdown && (
+            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-md max-h-60 overflow-y-auto text-sm">
+              {searchResults.length > 0 ? (
+                searchResults.map((result, index) => (
+                  <div
+                    key={index}
+                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                  >
+                    <span className="font-semibold">{result.title}</span>{" "}
+                    <span className="text-gray-500">({result.category})</span>
+                  </div>
+                ))
+              ) : (
+                <div className="px-4 py-2 text-gray-500">No result found</div>
+              )}
+            </div>
+          )}
         </div>
       </div>
       <div className="bg-[#F0F5FA] pb-10 px-10">
